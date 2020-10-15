@@ -1,0 +1,9 @@
+#module _Aguraki_DisplayHz_
+#uselib "user32.dll"
+#func EnumDisplaySettings "EnumDisplaySettingsA" sptr,int,var
+#define ENUM_CURRENT_SETTINGS -1
+#defcfunc GetDisplayHz
+	dim DEVMODE,156/4
+	EnumDisplaySettings 0,ENUM_CURRENT_SETTINGS,DEVMODE
+return DEVMODE(30)
+#global

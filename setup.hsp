@@ -1,0 +1,42 @@
+#include "DisplayHz.hsp"
+#include "user32.as"
+#include "hsp3utf.as"
+d = GetDisplayHz()+1 : dhz = double(d) : awt = (1000.0 / dhz) : max = 1 : rr = 1+rnd(255)
+dimtype x, vartype("int"), max
+dimtype y, vartype("int"), max
+dimtype xm, vartype("str"), max
+dimtype ym, vartype("str"), max
+screen 2, ginfo(20), ginfo(21)
+picload "DVD_Logo.jpg"
+winx = ginfo_winx : winy = ginfo_winy
+gsel 2, -1
+rr = 1
+repeat 191
+	exist "DVD_Logo_"+rr+".bmp"
+	if strsize == -1 {
+		screen 3, winx/2, winy/2
+		gzoom winx/2, winy/2, 2, 0, 0, winx, winy
+		fx = 0
+		repeat (winx/2)
+			fy = 0
+			repeat (winy/2)
+				pget fx, fy
+				r = ginfo_r : g = ginfo_g : b = ginfo_b
+				if r >= 100 {
+					if g >= 100 {
+						if b >= 100 {
+							hsvcolor rr, 200, 200
+						}
+					}
+				}
+				pset fx, fy
+				fy++
+			loop
+			fx++
+		loop
+		gsel 3, -1
+		bmpsave "DVD_Logo_"+rr+".bmp"
+		}
+	rr++
+loop
+end

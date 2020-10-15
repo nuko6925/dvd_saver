@@ -1,0 +1,107 @@
+#include "DisplayHz.hsp"
+#include "user32.as"
+#include "hsp3utf.as"
+d = GetDisplayHz()+1 : dhz = double(d) : awt = (1000.0 / dhz) : max = 1 : rr = 1+rnd(255)
+dimtype x, vartype("int"), max
+dimtype y, vartype("int"), max
+dimtype xm, vartype("str"), max
+dimtype ym, vartype("str"), max
+screen 0, ginfo(20), ginfo(21)
+GetWindowLong hwnd, -16
+SetWindowLong hwnd, -16, stat | $10000 | $40000
+width 1280, 720
+randomize
+repeat max
+	x(cnt) = rnd(ginfo(12))
+	y(cnt) = rnd(ginfo(13))
+	_tmp = rnd(2)
+	_tm = rnd(2)
+	if _tmp == 0 {
+		xm(cnt) = "add"
+	} else {
+		xm(cnt) = "rem"
+	}
+	if _tm == 0 {
+		ym(cnt) = "add"
+	} else {
+		ym(cnt) = "rem"
+	}
+loop
+aaaaa = 1
+file = ""
+size = 0
+repeat 191
+	redraw 1 : await 20 : redraw 0
+	color 255, 255, 255 : boxf
+	file = "DVD_Logo_"+aaaaa+".bmp"
+	exist file
+	if strsize != -1 {
+		buffer aaaaa, ginfo(20), ginfo(21)
+		picload file
+		size += strsize
+	} else {
+		dialog ""+file+" is not found"
+		end
+	}
+	aaaaa++
+	gsel 0
+	await (1+rnd(20))
+	title ""+(aaaaa-1)+"/191 texture loading..."
+	color
+	pos (ginfo(12)/2)-(191/2), (ginfo(13)/2)-54 : mes ""+strf("%3d", aaaaa)+"/191"
+	mes strf("%3.2f", ((double(size)/double(1000))/double(1000)))+"MB"
+	boxf (ginfo(12)/2)-(191/2), (ginfo(13)/2)-10, (ginfo(12)/2)-(191/2)+193, (ginfo(13)/2)+10
+	color , 255,  : boxf (ginfo(12)/2)-(191/2)+1, (ginfo(13)/2)-9, (ginfo(12)/2)-(191/2)+1+aaaaa, (ginfo(13)/2)+9
+loop
+gsel 100
+winx = ginfo_winx : winy = ginfo_winy
+gsel 0
+title "DVD‚Ì‚â‚Â"
+await 1000
+*main
+	redraw 1 : await awt : redraw 0
+	color : boxf : color 255, 255, 255
+	repeat max
+		if xm(cnt) == "add" {
+			x(cnt)++
+		} else : if xm(cnt) == "rem" {
+			x(cnt)--
+		}
+		if ym(cnt) == "add" {
+			y(cnt)++
+		} else : if ym(cnt) == "rem" {
+			y(cnt)--
+		}
+	loop
+	repeat max
+		//if x(cnt)+ginfo_mesx >= ginfo(12) {
+		if x(cnt)+winx >= ginfo(12) {
+			if xm(cnt) == "add" {
+				xm(cnt) = "rem"
+				rr = 1+rnd(191)
+			}
+		} else : if x(cnt) <= 0 {
+			if xm(cnt) == "rem" {
+				xm(cnt) = "add"
+				rr = 1+rnd(191)
+			}
+		}
+		if y(cnt)+winy >= ginfo(13) {
+			if ym(cnt) == "add" {
+				ym(cnt) = "rem"
+				rr = 1+rnd(191)
+			}
+		} else : if y(cnt) <= 0 {
+			if ym(cnt) == "rem" {
+				ym(cnt) = "add"
+				rr = 1+rnd(191)
+			}
+		}
+	loop
+	repeat max
+		//hsvcolor rr, 200, 200 : pos x(cnt), y(cnt) : mes "DVD‚Ì‚â‚Â"
+		//pos x(cnt), y(cnt) : gcopy 2, 0, 0, winx, winy
+		pos x(cnt), y(cnt) : gzoom winx, winy, rr, 0, 0, winx, winy
+	loop
+	goto *main
+	stop
